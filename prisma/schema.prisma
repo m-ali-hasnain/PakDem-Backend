@@ -1,0 +1,440 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+model AgentTbl {
+  AgentID                                    Int           @id(map: "PK_AgentTbl") @default(autoincrement())
+  RegistrationDate                           DateTime?     @db.DateTime
+  AgentName                                  String?       @db.NVarChar(100)
+  AgentCNICNo                                String?       @db.NVarChar(100)
+  AgentFatherName                            String?       @db.NVarChar(100)
+  CompanyName                                String?       @db.NVarChar(100)
+  CompanyAddress                             String?       @db.NVarChar(150)
+  OfficeNo                                   String?       @db.NVarChar(50)
+  Phone                                      String?       @db.NVarChar(50)
+  Email                                      String?       @db.NVarChar(50)
+  CommissionPercentage                       Int?
+  DownPaymentCommission                      Int?
+  InstallmentCommission                      Int?
+  OpeningBalance                             Decimal?      @db.Decimal(18, 2)
+  OpeningBalanceDate                         DateTime?     @db.DateTime
+  MainAppForm_MainAppForm_InvestorToAgentTbl MainAppForm[] @relation("MainAppForm_InvestorToAgentTbl")
+  MainAppForm_MainAppForm_SubAgentToAgentTbl MainAppForm[] @relation("MainAppForm_SubAgentToAgentTbl")
+  VoucherTbl                                 VoucherTbl[]
+}
+
+model ChargesTypeTbl {
+  ChargesSeniority Int     @id(map: "PK_ChargesTypeTbl")
+  ChargesType      String? @db.NChar(50)
+}
+
+model DailyExpenditure {
+  ExpenditureID     Int       @id(map: "PK_DailyExpenditure") @default(autoincrement())
+  ExpDate           DateTime? @db.Date
+  Expenditure       Int?
+  Amount            Int?
+  Remarks           String?   @db.NVarChar(250)
+  ExpenditureNature String?   @db.NVarChar(100)
+}
+
+model DealDetailTbl {
+  DealDetailID Int      @id(map: "PK_InvoiceLineID") @default(autoincrement())
+  DealID       Int
+  PlotNo       Int?
+  PlotPrice    Decimal? @db.Decimal(18, 0)
+  PlotSize     String?  @db.NVarChar(150)
+  PlotLocation String?  @db.NVarChar(150)
+  Qty          Decimal  @db.Decimal(18, 0)
+  Rate         Decimal  @db.Decimal(18, 0)
+  DealTbl      DealTbl  @relation(fields: [DealID], references: [DealID], onUpdate: NoAction, map: "FK_DealDetailTbl_DealTbl")
+}
+
+model DealTbl {
+  DealID        Int             @id(map: "PK_DealTbl") @default(autoincrement())
+  DealDate      DateTime?       @db.Date
+  CustomerName  String?         @db.NVarChar(100)
+  ContactNo     String?         @db.NVarChar(100)
+  CNIC          String?         @db.NVarChar(100)
+  Address       String?         @db.NVarChar(200)
+  DealDetailTbl DealDetailTbl[]
+}
+
+model ExpenditureTbl {
+  ExpenditureID     Int               @id(map: "PK_ExpenditureTbl") @default(autoincrement())
+  ExpDate           DateTime?         @db.Date
+  Amount            Int?
+  Remarks           String?           @db.NVarChar(250)
+  ExpenditureNature String?           @db.NVarChar(100)
+  PVNo              String?           @db.NVarChar(100)
+  ModeOfPayment     String?           @db.NVarChar(100)
+  ToPayee           String?           @db.NVarChar(100)
+  PayeeCNICNo       String?           @db.NVarChar(100)
+  MobileNo          String?           @db.NVarChar(100)
+  ExpenseID         Int?
+  ExpenseHeadsTbls  ExpenseHeadsTbls? @relation(fields: [ExpenseID], references: [ExpenseID], onDelete: NoAction, onUpdate: NoAction, map: "FK_ExpenditureTbl_ExpenseHeadsTbls")
+}
+
+model ExpenseHeadsTbls {
+  ExpenseID       Int              @id(map: "PK_ExpenseHeadsTbls") @default(autoincrement())
+  ExpenseMainHead String?          @db.NVarChar(100)
+  ExpenseSubHead  String?          @db.NVarChar(100)
+  ExpenseNature   String?          @db.NVarChar(100)
+  ExpenditureTbl  ExpenditureTbl[]
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model ledger_report {
+  Application_No             Int
+  Date                       DateTime  @db.Date
+  File_No                    String    @db.NVarChar(150)
+  Area                       String    @db.NVarChar(150)
+  Phase                      String    @db.NVarChar(50)
+  Block                      String    @db.NVarChar(50)
+  Plot_No                    String    @db.NVarChar(50)
+  Total_instalment           Int
+  Plot_Location              String    @db.NVarChar(50)
+  Applicant_Name             String    @db.NVarChar(50)
+  S_O_D_O_W_O                String    @map("S/O,D/O,W/O") @db.NVarChar(50)
+  Cnic                       String    @db.NVarChar(50)
+  Contact_No                 String    @db.NVarChar(50)
+  Permanent_Address          String    @db.NVarChar(150)
+  Postal_Address             String    @db.NVarChar(150)
+  NOK                        String    @db.NVarChar(50)
+  S_O_W_O_D_O                String    @map("[S/O,W/O,D/O") @db.NVarChar(50)
+  NOK_Relation               String    @db.NVarChar(150)
+  NOK_Address                String    @db.NVarChar(150)
+  Referance                  String    @db.NVarChar(50)
+  Cell_No                    String    @db.NVarChar(50)
+  Mode_Of_Payment            String    @db.NVarChar(50)
+  Total_Amount               BigInt
+  InvestorRate               BigInt?
+  Down_Payment               BigInt
+  InvestorDownPayment        BigInt?
+  InvestorMonthlyInstallment Int?
+  Monthly_Instalment         String    @db.NVarChar(50)
+  Amount                     BigInt
+  Datee                      DateTime  @db.Date
+  Sur_charge                 String    @db.NVarChar(50)
+  Received                   BigInt
+  LTotal_Amount              BigInt
+  Balance_Amount             BigInt
+  Receipt                    String    @db.NVarChar(50)
+  Remarks                    String    @db.NVarChar(50)
+  CornerCharges              BigInt?
+  GrandTotal                 BigInt?
+  NoteNo                     String?   @db.NVarChar(100)
+  Agent                      Int?
+  IsCurrentWith              Boolean?
+  AgentName                  String?   @db.NVarChar(100)
+  CommAmount                 Decimal?  @db.Decimal(18, 2)
+  TotalCommission            BigInt?
+  TotalCommReceived          BigInt?
+  TotalBalanceComm           BigInt?
+  DevelopmentChargesIncluded Boolean?
+  DevelopmentAmount          BigInt?
+  DevelopmentChargesDate     DateTime? @db.DateTime
+  ReceiptCatgory             String?   @db.NVarChar(100)
+
+  @@ignore
+}
+
+model MainAppForm {
+  ApplicationNo                           Int                      @id(map: "PK_MainAppForm") @default(autoincrement())
+  Date                                    DateTime                 @db.Date
+  FileNo                                  String                   @db.NVarChar(10)
+  FileType                                String?                  @db.NVarChar(100)
+  Area                                    String?                  @db.NVarChar(50)
+  PlotNo                                  String?                  @db.NVarChar(15)
+  PlotID                                  Int?
+  Phase                                   String?                  @db.NVarChar(15)
+  Block                                   String?                  @db.NVarChar(15)
+  Total_Installment                       Int
+  PlotLocation                            String?                  @db.NVarChar(50)
+  ApplicantName                           String                   @db.NVarChar(100)
+  FatherOrHusband                         String                   @db.NVarChar(100)
+  CNICNo                                  String?                  @db.NVarChar(50)
+  ContactNo                               String?                  @db.NVarChar(50)
+  PermanentAddress                        String                   @db.NVarChar(200)
+  PostalAddress                           String?                  @db.NVarChar(200)
+  Nok                                     String                   @db.NVarChar(100)
+  NoKFatherName                           String?                  @db.NVarChar(100)
+  NokSRelation                            String?                  @db.NVarChar(50)
+  NoKAddress                              String?                  @db.NVarChar(200)
+  Refrence                                String?                  @db.NVarChar(50)
+  ModeOfPayment                           String?                  @db.NVarChar(50)
+  InvestorAmount                          BigInt?
+  InvestorDownPayment                     BigInt?
+  TotalAmount                             BigInt
+  DownPayment                             BigInt
+  MonthlyInstallment                      Int?
+  InvestorMonthlyInstallment              Int?
+  CornerCharges                           BigInt?
+  GrandTotal                              BigInt?
+  AppRemarks                              String?                  @db.NVarChar(150)
+  RefMobileNo                             String?                  @db.NVarChar(50)
+  Agent                                   Int?
+  CommissionPercentage                    Int?
+  NoteNo                                  String?                  @db.NVarChar(100)
+  IsActive                                Boolean?
+  IsPlotCancel                            String?                  @db.NVarChar(100)
+  IsCurrentWith                           Boolean?
+  PlotCategory                            String?                  @db.NVarChar(100)
+  Discount                                BigInt?
+  PossesionStatus                         Boolean?
+  SubAgent                                Int?
+  SubAgentComm                            Int?
+  Investor                                Int?
+  Prepaired_By                            Int?
+  Prepaired_by_Name                       String?                  @db.NVarChar(50)
+  TransferAmount                          BigInt?
+  TransferDate                            DateTime?                @db.DateTime
+  DevelopmentChargesIncluded              Boolean?
+  DevelopmentAmount                       BigInt?
+  DevelopmentChargesDate                  DateTime?                @db.DateTime
+  UpdatedBy                               Int?
+  RefundedStatus                          Boolean?
+  RefundDate                              DateTime?                @db.DateTime
+  DeductedAmount                          BigInt?
+  InstallmentsForRefund                   Int?
+  RefundAmount                            BigInt?
+  registry_Ineqal_Charges                 BigInt?
+  Registry_Date                           DateTime?                @db.DateTime
+  Registry_Number                         Int?
+  Inteqal_Number                          Int?
+  inteqal_date                            DateTime?                @db.DateTime
+  AgentTbl_MainAppForm_InvestorToAgentTbl AgentTbl?                @relation("MainAppForm_InvestorToAgentTbl", fields: [Investor], references: [AgentID], onDelete: NoAction, onUpdate: NoAction, map: "FK_MainAppForm_AgentTbl")
+  AgentTbl_MainAppForm_SubAgentToAgentTbl AgentTbl?                @relation("MainAppForm_SubAgentToAgentTbl", fields: [SubAgent], references: [AgentID], onDelete: NoAction, onUpdate: NoAction, map: "FK_MainAppForm_AgentTbl1")
+  RegistrationTbl                         RegistrationTbl?         @relation(fields: [Investor], references: [RegisterationID], onDelete: NoAction, onUpdate: NoAction, map: "FK_MainAppForm_RegistrationTbl")
+  PaymentSchedule                         PaymentSchedule[]
+  PlotAllotmentTbl                        PlotAllotmentTbl[]
+  PlotCancellationLetter                  PlotCancellationLetter[]
+  RefundTbl                               RefundTbl[]
+  VoucherTbl                              VoucherTbl[]
+}
+
+model ModeOfPayment {
+  ModeOfPaymentSerial Int     @id(map: "PK_ModeOfPayment")
+  ModeOfPayment       String? @db.NVarChar(50)
+}
+
+model MonthWiseReport {
+  Date                  DateTime @db.Date
+  Total_Received_Amount BigInt
+  Office_Expence        BigInt
+  Net_Amount            BigInt
+  ReportID              Int      @id(map: "PK__MonthWis__D5BD48E5BBB89695") @default(autoincrement())
+}
+
+model PaymentSchedule {
+  PaymentScheduleID   Int          @id(map: "PK_PaymentSchedule") @default(autoincrement())
+  FileNo              Int?
+  DueDate             DateTime?    @db.DateTime
+  MonthIyInstallement BigInt?
+  PaymentNature       String?      @db.NVarChar(100)
+  MainAppForm         MainAppForm? @relation(fields: [FileNo], references: [ApplicationNo], onDelete: NoAction, onUpdate: NoAction, map: "FK_PaymentSchedule_MainAppForm")
+}
+
+model PlotAllotmentTbl {
+  PlotAllotmentID Int          @id(map: "PK_PlotAllotmentTbl") @default(autoincrement())
+  AllotmentDate   DateTime?    @db.Date
+  AllotmentTime   DateTime?    @db.Time
+  FileNo          Int?
+  PlotID          Int?
+  IsActive        Boolean?
+  MainAppForm     MainAppForm? @relation(fields: [FileNo], references: [ApplicationNo], onDelete: NoAction, onUpdate: NoAction, map: "FK_PlotAllotmentTbl_MainAppForm")
+  PlotsTbl        PlotsTbl?    @relation(fields: [PlotID], references: [PlotID], onDelete: NoAction, onUpdate: NoAction, map: "FK_PlotAllotmentTbl_PlotsTbl")
+}
+
+model PlotCancellationLetter {
+  PlotCancelID          Int          @id(map: "PK_PlotCancellationLetter") @default(autoincrement())
+  PlotID                Int?
+  CancellationDate      DateTime?    @db.DateTime
+  AmountNotPaid         Decimal?     @db.Decimal(18, 0)
+  ReasonForCancellation String?      @db.NVarChar(Max)
+  MainAppForm           MainAppForm? @relation(fields: [PlotID], references: [ApplicationNo], onDelete: NoAction, onUpdate: NoAction, map: "FK_PlotCancellationLetter_MainAppForm")
+}
+
+model PlotLocationTbl {
+  PlotLocationSerial Int     @id(map: "PK_PlotLocationTbl")
+  PlotLocation       String? @db.NVarChar(50)
+}
+
+model PlotPrice {
+  PlotPriceID               Int       @id(map: "PK_PlotPrice") @default(autoincrement())
+  PlotCategory              String?   @db.NVarChar(100)
+  PlotSize                  String?   @db.NVarChar(100)
+  PriceDate                 DateTime? @db.DateTime
+  PlotPrice                 BigInt?
+  TokenMoney                BigInt?
+  ConfirmationAdvance       BigInt?
+  MonthlyInstallment        BigInt?
+  QuarterlyInstallment      BigInt?
+  TotalInstallmentQuarterly BigInt?
+  TotalMonthlyInstallments  BigInt?
+  Extra15Percent            BigInt?
+}
+
+model PlotSerials {
+  PlotNoSerial      Int     @id(map: "PK_PlotSerials")
+  PlotBlockAndPhase String? @db.NVarChar(50)
+}
+
+model PlotsTbl {
+  PlotID                    Int                @id(map: "PK_PlotsTbl") @default(autoincrement())
+  ProjectID                 Int?
+  PlotPrice                 Int
+  PlotNo                    Int?
+  Plots                     String?            @db.NVarChar(100)
+  PlotSize                  String?            @db.NVarChar(100)
+  Street                    String?            @db.NVarChar(100)
+  Phase                     String?            @db.NVarChar(100)
+  Block                     String?            @db.NVarChar(100)
+  Category                  String?            @db.NVarChar(100)
+  PlotLocation              String?            @db.NVarChar(100)
+  Amount                    BigInt?
+  PlotStatus                String?            @db.NVarChar(100)
+  sold                      Boolean?
+  TokenMoney                BigInt?
+  CornfirmationAdvance      BigInt?
+  MonthlyInstallment        BigInt?
+  QuarterlyInstallment      BigInt?
+  Extra15Percent            BigInt?
+  TotalQuarterlyInstallment BigInt?
+  TotalMonthlyInstallment   BigInt?
+  PlotAllotmentTbl          PlotAllotmentTbl[]
+}
+
+model ReceiptTbl {
+  Id                       Int       @id(map: "PK_ReceiptTbl") @default(autoincrement())
+  ReceiptNo                Int
+  FileNo                   String?   @db.NChar(10)
+  Date                     DateTime  @db.Date
+  ReceivedAmount           BigInt
+  ReceivedDifferenceAmount BigInt?
+  ReceivedFrom             String?   @db.NVarChar(50)
+  Amount_For_The_Month_Of  String?   @db.NVarChar(100)
+  AmountReceivedForPlot    String    @db.NVarChar(100)
+  ModeOfPayment            String    @db.NVarChar(50)
+  Receipt                  Int
+  Phase                    String?   @db.NVarChar(150)
+  Block                    String?   @db.NVarChar(150)
+  Plot_No                  String?   @db.NVarChar(50)
+  Prepaired_By             Int
+  Prepaired_by_Name        String    @db.NVarChar(50)
+  Remarks                  String?   @db.NVarChar(100)
+  Balancamount             Decimal?  @db.Decimal(18, 5)
+  ReceiptCatgory           String?   @db.NVarChar(100)
+  ReceiptStatus            String?   @db.NVarChar(100)
+  NextDueDate              DateTime? @db.DateTime
+  AgentID                  Int?
+  AgentName                String?   @db.NVarChar(100)
+  CommAmount               Decimal?  @db.Decimal(18, 2)
+  CommRemarks              String?   @db.NVarChar(100)
+  ReceiptType              Int?
+  Online_Method            String?   @db.VarChar(50)
+  Method_ID                String?   @db.VarChar(50)
+}
+
+model RefrenceTbl {
+  ReferenceNo    Int     @id(map: "PK_RefrenceTbl")
+  RefrenceName   String? @db.NVarChar(50)
+  RefrenceMobile String? @db.NChar(10)
+  Address        String? @db.NVarChar(150)
+}
+
+model RefundTbl {
+  RefundID      Int          @id(map: "PK_RefundTbl") @default(autoincrement())
+  ApplicationNo Int?
+  RefundDate    DateTime?    @db.DateTime
+  RefundAmount  BigInt?
+  Installment   String?      @db.NVarChar(100)
+  ModeofPayment String?      @db.NVarChar(100)
+  Remarks       String?      @db.NVarChar(Max)
+  MainAppForm   MainAppForm? @relation(fields: [ApplicationNo], references: [ApplicationNo], onDelete: NoAction, onUpdate: NoAction, map: "FK_RefundTbl_MainAppForm")
+}
+
+model RegistrationRoles {
+  RolesID Int     @id(map: "PK_RegistrationRoles") @default(autoincrement())
+  Roles   String? @db.NVarChar(100)
+}
+
+model RegistrationTbl {
+  RegisterationID  Int           @id(map: "PK_RegistrationTbl") @default(autoincrement())
+  RegistrationDate DateTime?     @db.DateTime
+  Name             String?       @db.NVarChar(100)
+  CNICNo           String?       @db.NVarChar(100)
+  SpouseName       String?       @db.NVarChar(100)
+  CompanyName      String?       @db.NVarChar(100)
+  CompanyAddress   String?       @db.NVarChar(200)
+  OfficeNo         String?       @db.NVarChar(100)
+  ContactNo        String?       @db.NVarChar(100)
+  Email            String?       @db.NVarChar(100)
+  RegistrationAs   Int?
+  UserName         String?       @db.NVarChar(100)
+  Password         String?       @db.NVarChar(100)
+  MainAppForm      MainAppForm[]
+}
+
+model RolesTbls {
+  RolesID  Int        @id(map: "PK_RolesTbls") @default(autoincrement())
+  Roles    String?    @db.NVarChar(100)
+  UsersTbl UsersTbl[]
+}
+
+model sysdiagrams {
+  name         String @db.NVarChar(128)
+  principal_id Int
+  diagram_id   Int    @id(map: "PK__sysdiagr__C2B05B61418E6405") @default(autoincrement())
+  version      Int?
+  definition   Bytes?
+
+  @@unique([principal_id, name], map: "UK_principal_name")
+}
+
+model testtable {
+  ApplicationNo    Int
+  Applicant_Name   String   @db.NVarChar(150)
+  Date             DateTime @db.Date
+  File_No          String   @db.NVarChar(150)
+  Phase            String?  @db.NVarChar(150)
+  Receipt          Int
+  Receivied_Amount BigInt
+  Mode_Of_Payment  String   @db.NVarChar(50)
+  Agent            String?  @db.NVarChar(100)
+  Remarks          String?  @db.NChar(10)
+  ReceiptCatgory   String?  @db.NVarChar(100)
+  AgentID          Int?
+  AgentName        String?  @db.NVarChar(100)
+  CommAmount       Decimal? @db.Decimal(18, 2)
+  id               Int      @id(map: "PK_testtable") @default(autoincrement())
+}
+
+model UsersTbl {
+  UserID        Int        @id(map: "PK_UsersTbl") @default(autoincrement())
+  UserName      String?    @db.VarChar(50)
+  Password      String?    @db.VarChar(15)
+  RolesID       Int?
+  LoginDateTime DateTime?  @db.DateTime
+  IPAdderss     String?    @db.NVarChar(100)
+  RolesTbls     RolesTbls? @relation(fields: [RolesID], references: [RolesID], onDelete: NoAction, onUpdate: NoAction, map: "FK_UsersTbl_RolesTbls")
+}
+
+model VoucherTbl {
+  VoucherID            Int         @id(map: "PK_VoucherTbl") @default(autoincrement())
+  FileNo               Int
+  VoucherDate          DateTime?   @db.Date
+  Agent                Int?
+  Amount               Int?
+  Description          String?     @db.NVarChar(200)
+  CommissionPercentage Int?
+  CommissionType       String?     @db.NVarChar(100)
+  BBF                  Decimal?    @db.Decimal(18, 2)
+  VoucherNo            String?     @db.NVarChar(100)
+  AgentTbl             AgentTbl?   @relation(fields: [Agent], references: [AgentID], onDelete: NoAction, onUpdate: NoAction, map: "FK_VoucherTbl_AgentTbl")
+  MainAppForm          MainAppForm @relation(fields: [FileNo], references: [ApplicationNo], onUpdate: NoAction, map: "FK_VoucherTbl_MainAppForm")
+}
